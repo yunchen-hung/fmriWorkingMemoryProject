@@ -8,13 +8,7 @@ from nilearn.plotting import plot_anat, plot_img, plot_stat_map, show, plot_desi
 from nilearn.glm import threshold_stats_img
 from nilearn.glm.first_level import FirstLevelModel, make_first_level_design_matrix
 from nilearn.reporting import get_clusters_table
-from nilearn.input_data import NiftiMasker
 
-#sklearn imports
-from sklearn.svm import SVC
-from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import train_test_split, cross_val_score
-from sklearn.metrics import accuracy_score, confusion_matrix, ConfusionMatrixDisplay
 
 #function to get first level weights for the runs
 #possible task types include colorWheel or sameDifferent 
@@ -61,40 +55,7 @@ def extract_beta_weights(subject_id = None, task_type = 'colorWheel',  n_runs=1)
         # t-statistic to z-scale 
         z_map = fmri_glm.compute_contrast(activation, output_type="z_score")
         run_betas[task_type][f'run_{num_run+1}'] = {z_map}
-
-        # extracting relevant features
-
-        features = []
-        all_labels = []
-
-        masker = NiftiMasker(mask_img=run_img, standardize=True)
-        features = masker.fit_transform(z_map)
-        all_features.append(features.ravel())
-        all_labels.append(0 if task_type == 'colorWheel' else 1)
-    
-    #return clusters_df
-    return all_features, all_labels
-
-def train_model(X, y):
-    
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-    # SVM classifier
-    svm_model = SVC(kernel='linear')
-    svm_model.fit(X_train, y_train)
-    y_pred = svm_model.predict(X_test)
-
-    # Evaluate performance
-    accuracy = accuracy_score(y_test, y_pred)
-    print("Model Accuracy: " + str(accuracy))
-
-    # Confusion matrix
-    cm = confusion_matrix(y_test, y_pred)
-    disp = ConfusionMatrixDisplay(confusion_matrix=cm)
-    disp.plot()
-    show()
-
-    return svm_model
+    return run_betas
 
 def main():
     top29Subjects = [103, 105, 106, 110, 112, 113, 115, 124, 127, 130, 
@@ -104,12 +65,4 @@ def main():
     
     for subjID in top29Subjects:
         for task in taskType:
-            features, labels = extract_beta_weights(subject_id=subjID, task_type=task)
-            all_subject_features.extend(features)
-            all_subject_labels.extend(labels)
-
-    X = np.array(all_subject_features)
-    y = np.array(all_subject_labels)
-
-    # Train and evaluate the model
-    model = train_and_evaluate_model(X, y)
+            extract_beta_weights(subject_id=subjID, task_type=task, n_runs=4)
