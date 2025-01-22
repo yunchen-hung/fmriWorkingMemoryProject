@@ -16,10 +16,16 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.metrics import accuracy_score, confusion_matrix, ConfusionMatrixDisplay
 
-#function to get first level weights for the runs
-#possible task types include colorWheel or sameDifferent 
 
 def extract_beta_weights(subject_id = None, task_type = 'colorWheel',  n_runs=1):
+    """
+    extract_beta_weights runs first level analysis on each of the subjects, 
+    storing their weights for each task type and run in a dictionary.
+
+    subject_id: subject ID 
+    task_type: colorWheel or sameDifferent 
+    n_runs: max 4 runs, use less when testing
+    """
     #parameters
     tr = 2.0 
     hrf_model = "spm + derivative"
@@ -58,8 +64,9 @@ def extract_beta_weights(subject_id = None, task_type = 'colorWheel',  n_runs=1)
 
         #should we remove confound with high_variance_confounds?
 
-        # t-statistic to z-scale 
+        # z-scale 
         z_map = fmri_glm.compute_contrast(activation, output_type="z_score")
+       
         run_betas[task_type][f'run_{num_run+1}'] = {z_map}
 
         # extracting relevant features
