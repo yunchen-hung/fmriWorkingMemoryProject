@@ -71,7 +71,7 @@ def extract_beta_weights(subject_id = None, task_type = 'colorWheel',  n_runs=1)
 
         # extracting relevant features
 
-        features = []
+        all_features = []
         all_labels = []
 
         masker = NiftiMasker(mask_img=run_img, standardize=True)
@@ -108,6 +108,8 @@ def main():
                     131, 133, 138, 142, 143, 145, 157, 159, 161, 165, 
                     173, 176, 177, 183, 187, 195, 200, 207, 208]
     taskType = ['colorWheel', 'sameDifferent']
+    all_subject_features = []
+    all_subject_labels = []
     
     for subjID in top29Subjects:
         for task in taskType:
