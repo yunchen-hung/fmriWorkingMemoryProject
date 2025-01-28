@@ -39,11 +39,6 @@ def extract_beta_weights(subject_id = None, task_type = 'colorwheel',  n_runs=1)
     # choose whatever confounds you want to include
     interested_confounds = ['white_matter']
 
-    run_betas = {
-        'colorwheel': {},
-        'samedifferent': {}
-    }
-
     for num_run in range(n_runs):
         preproc_path = f"../fmriprep/sub-{subject_id}/func/sub-{subject_id}_task-{task_type}**run-{n_runs}**.nii.gz"
         events_path = f"../fmriprep/sub-{subject_id}/func/sub-{subject_id}_task-{task_type}**run-{n_runs}_events.tsv"
@@ -77,47 +72,4 @@ def extract_beta_weights(subject_id = None, task_type = 'colorwheel',  n_runs=1)
         # map of parameter estimates / beta weights
         # this is the 'feature' map to use in classification
         beta_weights = fmri_glm.compute_contrast("colorwheel", output_type="effect_size")
-        run_betas[task_type][f'run_{num_run+1}'] = {beta_weights}
-    return run_betas
-
-def train_evaluate_model(X, y):
-    
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-    # SVM classifier
-    svm_model = SVC(kernel='linear')
-    svm_model.fit(X_train, y_train)
-    y_pred = svm_model.predict(X_test)
-
-    # Evaluate performance
-    accuracy = accuracy_score(y_test, y_pred)
-    print("Model Accuracy: " + str(accuracy))
-
-    # Confusion matrix
-    cm = confusion_matrix(y_test, y_pred)
-    disp = ConfusionMatrixDisplay(confusion_matrix=cm)
-    disp.plot()
-    show()
-
-    return accuracy
-
-def main():
-    top29Subjects = [103, 105, 106, 110, 112, 113, 115, 124, 127, 130, 
-                    131, 133, 138, 142, 143, 145, 157, 159, 161, 165, 
-                    173, 176, 177, 183, 187, 195, 200, 207, 208]
-    taskType = ['colorWheel', 'sameDifferent']
-    all_subject_features = []
-    all_subject_labels = []
-    
-    for subjID in top29Subjects:
-        for task in taskType:
-            beta_weights = extract_beta_weights(subject_id=subjID, task_type=task)
-            all_subject_features.append(beta_weights)
-            all_subject_labels.append(task)
-
-    X = np.array(all_subject_features)
-    y = np.array(all_subject_labels)
-
-    # Train and evaluate the model
-    accuracy_score = train_evaluate_model(X, y)
-    print(accuracy_score)
+    return beta_weights
