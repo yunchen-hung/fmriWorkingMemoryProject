@@ -40,8 +40,8 @@ def extract_beta_weights(subject_id = None, task_type = 'colorwheel',  n_runs=1)
     interested_confounds = ['white_matter']
 
     for num_run in range(n_runs):
-        preproc_path = f"../fmriprep/sub-{subject_id}/func/sub-{subject_id}_task-{task_type}**run-{n_runs}**.nii.gz"
-        events_path = f"../fmriprep/sub-{subject_id}/func/sub-{subject_id}_task-{task_type}**run-{n_runs}_events.tsv"
+        preproc_path = f"../teams/a05/fmriprep/sub-{subject_id}/func/sub-{subject_id}_task-{task_type}**run-{n_runs}**.nii.gz"
+        events_path = f"../teams/a05/fmriprep/sub-{subject_id}/func/sub-{subject_id}_task-{task_type}**run-{n_runs}_events.tsv"
 
         #load subject nii files
         run_img = image.load_img(preproc_path)
@@ -73,3 +73,17 @@ def extract_beta_weights(subject_id = None, task_type = 'colorwheel',  n_runs=1)
         # this is the 'feature' map to use in classification
         beta_weights = fmri_glm.compute_contrast("colorwheel", output_type="effect_size")
     return beta_weights
+
+def main():
+    top29Subjects = [103, 105, 106, 110, 112, 113, 115, 124, 127, 130, 
+                    131, 133, 138, 142, 143, 145, 157, 159, 161, 165, 
+                    173, 176, 177, 183, 187, 195, 200, 207, 208]
+    taskType = ['colorWheel', 'sameDifferent']
+    all_subject_features = []
+    all_subject_labels = []
+    
+    for subjID in top29Subjects:
+        for task in taskType:
+            beta_weights = extract_beta_weights(subject_id=subjID, task_type=task)
+            all_subject_features.append(beta_weights)
+            all_subject_labels.append(task)
