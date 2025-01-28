@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 
 #nilearn imports
-from nilearn import plotting, image
+from nilearn import plotting, image, interfaces
 from nilearn.image import mean_img
 from nilearn.plotting import plot_anat, plot_img, plot_stat_map, show, plot_design_matrix
 from nilearn.glm import threshold_stats_img
@@ -17,7 +17,7 @@ from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.metrics import accuracy_score, confusion_matrix, ConfusionMatrixDisplay
 
 
-def extract_beta_weights(subject_id = None, task_type = 'colorWheel',  n_runs=1):
+def extract_beta_weights(subject_id = None, task_type = 'colorwheel',  n_runs=1):
     """
     extract_beta_weights runs first level analysis on each of the subjects, 
     storing their weights for each task type and run in a dictionary.
@@ -28,20 +28,37 @@ def extract_beta_weights(subject_id = None, task_type = 'colorWheel',  n_runs=1)
     """
     #parameters
     tr = 2.0 
+
+    # choose appropriate hrf model
     hrf_model = "spm + derivative"
-    smoothing_fwhm = 0.6
-    drift_model = "cosine"
+    smoothing_fwhm = 6 # gaussian kernel width (in mm)
+    drift_model = None  # cosine drift terms already in confounds
+    high_pass=None,  # drift terms equivalent to high-pass filter
+    n_jobs=-2,  # use all-1 available CPUs
+
+    # choose whatever confounds you want to include
+    interested_confounds = ['white_matter']
+
     run_betas = {
-        'colorWheel': {},
-        'sameDifferent': {}
+        'colorwheel': {},
+        'samedifferent': {}
     }
 
     for num_run in range(n_runs):
+        preproc_path = f"../fmriprep/sub-{subject_id}_task-{task_type}**run-{n_runs}**.nii.gz"
+        events_path = f"../fmriprep/sub-{subject_id}_task-{task_type}**run-{n_runs}_events.tsv"
+
         #load subject nii files
-        run_img = image.load_img(f'/Volumes/kiyonaga/MIPS/fMRI/subjects/MIPS_{subject_id}/func/run0{num_run+1}/srraf**.nii')
+        run_img = image.load_img(preproc_path)
 
         #load the event file for the run
-        events = pd.read_table(f'/Volumes/kiyonaga/MIPS/BIDS/sub-{subject_id}/func/sub-{subject_id}_task-{task_type.lower()}_acq-norm_run-{num_run+1}_events.tsv')
+        events = pd.read_csv(events_path, sep="\t", 
+                            usecols=["onset", "duration"]).assign(
+                            trial_type="colorwheel")
+
+        #include confounds
+        confounds = interfaces.fmriprep.load_confounds_strategy(
+            preproc_path, denoise_strategy="simple")[0][interested_confounds]
 
         #run the first level model
         fmri_glm = FirstLevelModel(
@@ -52,37 +69,18 @@ def extract_beta_weights(subject_id = None, task_type = 'colorWheel',  n_runs=1)
             minimize_memory=False   
         )
 
-        fmri_glm = fmri_glm.fit(run_img, events)
+        fmri_glm = fmri_glm.fit(run_img, events, confounds)
 
-        #create design matrix
+        #design matrix = task (convolved with HRF) + confounds
         design_matrix = fmri_glm.design_matrices_[0]
 
-        #
-        n_regressors = design_matrix.shape[1]
-        activation = np.zeros(n_regressors)
-        activation[0] = 1
+        # map of parameter estimates / beta weights
+        # this is the 'feature' map to use in classification
+        beta_weights = fmri_glm.compute_contrast("colorwheel", output_type="effect_size")
+        run_betas[task_type][f'run_{num_run+1}'] = {beta_weights}
+    return run_betas
 
-        #should we remove confound with high_variance_confounds?
-
-        # z-scale 
-        z_map = fmri_glm.compute_contrast(activation, output_type="z_score")
-       
-        run_betas[task_type][f'run_{num_run+1}'] = {z_map}
-
-        # extracting relevant features
-
-        all_features = []
-        all_labels = []
-
-        masker = NiftiMasker(mask_img=run_img, standardize=True)
-        features = masker.fit_transform(z_map)
-        all_features.append(features.ravel())
-        all_labels.append(0 if task_type == 'colorWheel' else 1)
-    
-    #return clusters_df
-    return all_features, all_labels
-
-def train_model(X, y):
+def train_evaluate_model(X, y):
     
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
@@ -101,7 +99,7 @@ def train_model(X, y):
     disp.plot()
     show()
 
-    return svm_model
+    return accuracy
 
 def main():
     top29Subjects = [103, 105, 106, 110, 112, 113, 115, 124, 127, 130, 
@@ -113,12 +111,13 @@ def main():
     
     for subjID in top29Subjects:
         for task in taskType:
-            features, labels = extract_beta_weights(subject_id=subjID, task_type=task)
-            all_subject_features.extend(features)
-            all_subject_labels.extend(labels)
+            beta_weights = extract_beta_weights(subject_id=subjID, task_type=task)
+            all_subject_features.append(beta_weights)
+            all_subject_labels.append(task)
 
     X = np.array(all_subject_features)
     y = np.array(all_subject_labels)
 
     # Train and evaluate the model
-    model = train_and_evaluate_model(X, y)
+    accuracy_score = train_evaluate_model(X, y)
+    print(accuracy_score)
