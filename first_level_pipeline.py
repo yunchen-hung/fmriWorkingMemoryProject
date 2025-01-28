@@ -45,8 +45,8 @@ def extract_beta_weights(subject_id = None, task_type = 'colorwheel',  n_runs=1)
     }
 
     for num_run in range(n_runs):
-        preproc_path = f"../fmriprep/sub-{subject_id}_task-{task_type}**run-{n_runs}**.nii.gz"
-        events_path = f"../fmriprep/sub-{subject_id}_task-{task_type}**run-{n_runs}_events.tsv"
+        preproc_path = f"../fmriprep/sub-{subject_id}/func/sub-{subject_id}_task-{task_type}**run-{n_runs}**.nii.gz"
+        events_path = f"../fmriprep/sub-{subject_id}/func/sub-{subject_id}_task-{task_type}**run-{n_runs}_events.tsv"
 
         #load subject nii files
         run_img = image.load_img(preproc_path)
