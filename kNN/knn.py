@@ -11,9 +11,9 @@ from nilearn.reporting import get_clusters_table
 from nilearn.input_data import NiftiMasker
 
 #sklearn imports
-from sklearn.svm import SVC
-from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import train_test_split, cross_val_score
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import accuracy_score, confusion_matrix, ConfusionMatrixDisplay
 
 from first_level_pipeline import extract_beta_weights
@@ -22,10 +22,15 @@ def train_evaluate_model(X, y):
     
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-    # SVM classifier
-    svm_model = SVC(kernel='linear')
-    svm_model.fit(X_train, y_train)
-    y_pred = svm_model.predict(X_test)
+    # Feature Scaling for KNN
+    scaler = StandardScaler()
+    X_train = scaler.fit_transform(X_train)
+    X_test = scaler.transform(X_test)
+
+    # KNN classifier
+    knn_model = KNeighborsClassifier(n_neighbors=5)
+    knn_model.fit(X_train, y_train)
+    y_pred = knn_model.predict(X_test)
 
     # Evaluate performance
     accuracy = accuracy_score(y_test, y_pred)
@@ -51,7 +56,7 @@ def main():
         for task in taskType:
             beta_weights = extract_beta_weights(subject_id=subjID, task_type=task)
             all_subject_features.append(beta_weights)
-            all_subject_labels.append(task)
+            all_subject_labels.append(0 if task == 'colorWheel' else 1)  # Convert task labels to binary
 
     X = np.array(all_subject_features)
     y = np.array(all_subject_labels)
