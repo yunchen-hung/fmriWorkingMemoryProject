@@ -80,11 +80,14 @@ def main():
                     131, 133, 138, 142, 143, 145, 157, 159, 161, 165, 
                     173, 176, 177, 183, 187, 195, 200, 207, 208]
     taskType = ['colorWheel', 'sameDifferent']
-    all_subject_features = []
-    all_subject_labels = []
+    #all_subject_features = []
+    #all_subject_labels = []
     
     for subjID in top29Subjects:
         for task in taskType:
             beta_weights = extract_beta_weights(subject_id=subjID, task_type=task)
-            all_subject_features.append(beta_weights)
-            all_subject_labels.append(task)
+
+            #save beta weights
+            beta_weights.to_file()
+            #all_subject_features.append(beta_weights)
+            #all_subject_labels.append(task)
