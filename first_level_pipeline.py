@@ -73,7 +73,7 @@ def extract_beta_weights(subject_id = None, task_type = 'colorwheel',  num_run=1
     beta_weights = fmri_glm.compute_contrast(task_type, output_type="effect_size")
     return beta_weights
 
-def save_beta(img, subject_id = None, task_type = 'colorwheel',  run_num=1):
+def save_beta(img, subject_id = None, task_type = 'colorwheel', run_num=1):
     output_dir = Path("~/private/betas/")
     output_dir.mkdir(exist_ok=True, parents=True)
     img.to_filename(
@@ -90,7 +90,7 @@ def main():
     for subjID in top29Subjects:
         for task in taskType:
             for run in num_runs:
-                beta_weights = extract_beta_weights(subject_id=subjID, task_type=task, run)
+                beta_weights = extract_beta_weights(subject_id=subjID, task_type=task, run_num = run)
     
                 #save beta weights
                 save_beta(beta_weights, subjID, task)
