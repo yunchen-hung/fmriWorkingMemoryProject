@@ -42,35 +42,35 @@ def extract_beta_weights(subject_id = None, task_type = 'colorwheel',  num_run=1
     preproc_path = f"~/teams/a05/group_1_data/fmriprep/sub-{subject_id}/func/sub-{subject_id}_task-{task_type}**{num_run}**desc-preproc_bold.nii.gz"
     events_path = f"~/teams/a05/group_1_data/fmriprep/events/sub-{subject_id}_task-{task_type}_acq-multiband_run-{num_run}_events.tsv"
     
-        #load subject nii files
-        run_img = image.load_img(preproc_path)
+    #load subject nii files
+    run_img = image.load_img(preproc_path)
 
-        #load the event file for the run
-        events = pd.read_csv(events_path, sep="\t", 
-                            usecols=["onset", "duration"]).assign(
-                            trial_type=task_type)
+    #load the event file for the run
+    events = pd.read_csv(events_path, sep="\t", 
+                        usecols=["onset", "duration"]).assign(
+                        trial_type=task_type)
 
-        #include confounds
-        #confounds = interfaces.fmriprep.load_confounds_strategy(
-        #    preproc_path, denoise_strategy="simple")[0]#[interested_confounds]
+    #include confounds
+    #confounds = interfaces.fmriprep.load_confounds_strategy(
+    #    preproc_path, denoise_strategy="simple")[0]#[interested_confounds]
 
-        #run the first level model
-        fmri_glm = FirstLevelModel(
-            t_r=tr,
-            hrf_model=hrf_model,
-            smoothing_fwhm=smoothing_fwhm,
-            drift_model=drift_model,
-            minimize_memory=False   
-        )
+    #run the first level model
+    fmri_glm = FirstLevelModel(
+        t_r=tr,
+        hrf_model=hrf_model,
+        smoothing_fwhm=smoothing_fwhm,
+        drift_model=drift_model,
+        minimize_memory=False   
+    )
 
-        fmri_glm = fmri_glm.fit(run_img, events, )
+    fmri_glm = fmri_glm.fit(run_img, events, )
 
-        #design matrix = task (convolved with HRF) + confounds
-        design_matrix = fmri_glm.design_matrices_[0]
-        
-        # map of parameter estimates / beta weights
-        # this is the 'feature' map to use in classification
-        beta_weights = fmri_glm.compute_contrast(task_type, output_type="effect_size")
+    #design matrix = task (convolved with HRF) + confounds
+    design_matrix = fmri_glm.design_matrices_[0]
+    
+    # map of parameter estimates / beta weights
+    # this is the 'feature' map to use in classification
+    beta_weights = fmri_glm.compute_contrast(task_type, output_type="effect_size")
     return beta_weights
 
 def save_beta(img, subject_id = None, task_type = 'colorwheel',  run_num=1):
@@ -81,9 +81,7 @@ def save_beta(img, subject_id = None, task_type = 'colorwheel',  run_num=1):
     )
 
 def main():
-    top29Subjects = [103, 105, 106, 110, 112, 113, 115, 124, 127, 130, 
-                    131, 133, 138, 142, 143, 145, 157, 159, 161, 165, 
-                    173, 176, 177, 183, 187, 195, 200, 207, 208]
+    top29Subjects = [131, 133, 138, 142, 143, 145, 157, 159, 161, 165]
     taskType = ['colorwheel', 'samedifferent']
     num_runs =[1, 2, 3, 4]
     #all_subject_features = []
