@@ -17,7 +17,7 @@ from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.metrics import accuracy_score, confusion_matrix, ConfusionMatrixDisplay
 
 
-def extract_beta_weights(subject_id = None, task_type = 'colorwheel',  num_run=1):
+def extract_beta_weights(num_run, subject_id = None, task_type = 'colorwheel'):
     """
     extract_beta_weights runs first level analysis on each of the subjects, 
     storing their weights for each task type and run in a dictionary.
@@ -90,9 +90,13 @@ def main():
     for subjID in top29Subjects:
         for task in taskType:
             for run in num_runs:
-                beta_weights = extract_beta_weights(subject_id=subjID, task_type=task, run_num = run)
+                beta_weights = extract_beta_weights(run, subject_id=subjID, task_type=task)
     
                 #save beta weights
-                save_beta(beta_weights, subjID, task)
+                save_beta(beta_weights, subjID, task, run)
                 #all_subject_features.append(beta_weights)
                 #all_subject_labels.append(task)
+
+if __name__ == "__main__":
+    main()
+
