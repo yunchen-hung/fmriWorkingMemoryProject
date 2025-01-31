@@ -49,11 +49,11 @@ def extract_beta_weights(subject_id = None, task_type = 'colorwheel',  n_runs=1)
         #load the event file for the run
         events = pd.read_csv(events_path, sep="\t", 
                             usecols=["onset", "duration"]).assign(
-                            trial_type="colorwheel")
+                            trial_type=task_type)
 
         #include confounds
-        confounds = interfaces.fmriprep.load_confounds_strategy(
-            preproc_path, denoise_strategy="simple")[0]#[interested_confounds]
+        #confounds = interfaces.fmriprep.load_confounds_strategy(
+        #    preproc_path, denoise_strategy="simple")[0]#[interested_confounds]
 
         #run the first level model
         fmri_glm = FirstLevelModel(
@@ -64,11 +64,11 @@ def extract_beta_weights(subject_id = None, task_type = 'colorwheel',  n_runs=1)
             minimize_memory=False   
         )
 
-        fmri_glm = fmri_glm.fit(run_img, events, confounds)
+        fmri_glm = fmri_glm.fit(run_img, events, )
 
         #design matrix = task (convolved with HRF) + confounds
         design_matrix = fmri_glm.design_matrices_[0]
-
+        
         # map of parameter estimates / beta weights
         # this is the 'feature' map to use in classification
         beta_weights = fmri_glm.compute_contrast(task_type, output_type="effect_size")
