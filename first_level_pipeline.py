@@ -37,12 +37,12 @@ def extract_beta_weights(subject_id = None, task_type = 'colorwheel',  n_runs=1)
     n_jobs=-2,  # use all-1 available CPUs
 
     # choose whatever confounds you want to include
-    interested_confounds = ['white_matter']
+    interested_confounds = ["rot_x", "trans_x", "white_matter", "csf"]
 
     for num_run in range(n_runs):
-        preproc_path = f"../teams/a05/fmriprep/sub-{subject_id}/func/sub-{subject_id}_task-{task_type}**run-{n_runs}**.nii.gz"
-        events_path = f"../teams/a05/fmriprep/sub-{subject_id}/func/sub-{subject_id}_task-{task_type}**run-{n_runs}_events.tsv"
-
+        preproc_path = f"~/teams/a05/group_1_data/fmriprep/sub-{subject_id}/func/sub-{subject_id}_task-{task_type}**{num_run + 1}**desc-preproc_bold.nii.gz"
+        events_path = f"~/teams/a05/group_1_data/fmriprep/events/sub-{subject_id}_task-{task_type}_acq-multiband_run-{num_run+1}_events.tsv"
+        
         #load subject nii files
         run_img = image.load_img(preproc_path)
 
@@ -53,7 +53,7 @@ def extract_beta_weights(subject_id = None, task_type = 'colorwheel',  n_runs=1)
 
         #include confounds
         confounds = interfaces.fmriprep.load_confounds_strategy(
-            preproc_path, denoise_strategy="simple")[0][interested_confounds]
+            preproc_path, denoise_strategy="simple")[0]#[interested_confounds]
 
         #run the first level model
         fmri_glm = FirstLevelModel(
@@ -71,8 +71,9 @@ def extract_beta_weights(subject_id = None, task_type = 'colorwheel',  n_runs=1)
 
         # map of parameter estimates / beta weights
         # this is the 'feature' map to use in classification
-        beta_weights = fmri_glm.compute_contrast("colorwheel", output_type="effect_size")
+        beta_weights = fmri_glm.compute_contrast(task_type, output_type="effect_size")
     return beta_weights
+
 
 def main():
     top29Subjects = [103, 105, 106, 110, 112, 113, 115, 124, 127, 130, 
