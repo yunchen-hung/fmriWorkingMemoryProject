@@ -53,10 +53,6 @@ def extract_beta_weights(num_run, subject_id = None, task_type = 'colorwheel'):
                             usecols=["onset", "duration"]).assign(
                             trial_type=task_type)
     
-        #include confounds
-        #confounds = interfaces.fmriprep.load_confounds_strategy(
-        #    preproc_path, denoise_strategy="simple")[0]#[interested_confounds]
-    
     except:
         #if there isn't a specific run, i.e. run 4
         print("no run found!")
