@@ -23,7 +23,7 @@ def load_beta_data(top29Subjects):
     
     X, y = [], []
 
-    for subjID in topSubjects:
+    for subjID in top29Subjects:
         for task in taskType:
             for run in num_runs:
                 try:
