@@ -17,6 +17,7 @@ from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.metrics import accuracy_score, confusion_matrix, ConfusionMatrixDisplay
 
 from pathlib import Path
+import os.path 
 
 
 def extract_beta_weights(num_run, subject_id = None, task_type = 'colorwheel'):
@@ -32,17 +33,23 @@ def extract_beta_weights(num_run, subject_id = None, task_type = 'colorwheel'):
     tr = 2.0 
 
     # choose appropriate hrf model
-    hrf_model = "spm + derivative"
+    hrf_model = "glover + derivative"
     smoothing_fwhm = 6 # gaussian kernel width (in mm)
     drift_model = None  # cosine drift terms already in confounds
     high_pass=None,  # drift terms equivalent to high-pass filter
     n_jobs=-2,  # use all-1 available CPUs
 
     # choose whatever confounds you want to include
-    interested_confounds = ["rot_x", "trans_x", "white_matter", "csf"]
+    # jen: included rotation and translation along all axes, 
+    # and the white matter and cerebral spinal fluid
+    interested_confounds = ["rot_x", "rot_y", "rot_z", 
+                        "trans_x", "trans_y", "trans_z", 
+                        "white_matter", "csf"]
 
+    print(f"subj:{subject_id}, run {num_run}")
     try:
-        preproc_path = f"~/teams/a05/group_1_data/fmriprep/sub-{subject_id}/func/sub-{subject_id}_task-{task_type}**{num_run}**desc-preproc_bold.nii.gz"
+        preproc_path = f"~/teams/a05/group_1_data/fmriprep/sub-{subject_id}/func/sub-{subject_id}_task-{task_type}_acq-multiband_run-{num_run}_space-MNI152NLin6Asym_res-2_desc-preproc_bold.nii.gz"
+        openVersion = os.path.expanduser(f"~/teams/a05/group_1_data/fmriprep/sub-{subject_id}/func/sub-{subject_id}_task-{task_type}_acq-multiband_run-{num_run}_space-MNI152NLin6Asym_res-2_desc-preproc_bold.nii.gz")
         events_path = f"~/teams/a05/group_1_data/fmriprep/events/sub-{subject_id}_task-{task_type}_acq-multiband_run-{num_run}_events.tsv"
     
         #load subject nii files
@@ -52,10 +59,13 @@ def extract_beta_weights(num_run, subject_id = None, task_type = 'colorwheel'):
         events = pd.read_csv(events_path, sep="\t", 
                             usecols=["onset", "duration"]).assign(
                             trial_type=task_type)
-        if events is None:
-            print(f"subject ID:{subject_id}, # run:{num_run}")
-            return
-    
+
+        #include confounds
+        confounds = interfaces.fmriprep.load_confounds_strategy(
+            openVersion, denoise_strategy="simple")[0]
+        confounds = confounds[interested_confounds]
+
+
     except:
         #if there isn't a specific run, i.e. run 4
         print("no run found!")
@@ -71,11 +81,12 @@ def extract_beta_weights(num_run, subject_id = None, task_type = 'colorwheel'):
     )
 
     #fit the model
-    fmri_glm = fmri_glm.fit(run_img, events, )
+    print(run_img.shape)
+    print(confounds.shape)
+    fmri_glm = fmri_glm.fit(run_img, events, confounds)
 
     #design matrix = task (convolved with HRF) + confounds
     design_matrix = fmri_glm.design_matrices_[0]
-    print(design_matrix.columns)
     
     # map of parameter estimates / beta weights
     #this is the 'feature' map to use in classification
@@ -93,12 +104,12 @@ def save_beta(img, subject_id = None, task_type = 'colorwheel', run_num=1):
     )
 
 def main():
-    top29Subjects = [103, 105, 106, 110, 112, 113, 115, 124, 127, 130, 
+    top29Subjects = [103, 105, 106, 109, 110, 
+                    115, 124, 127, 130, 
                     131, 133, 138, 142, 143, 145, 157, 159, 161, 165, 
-                    173, 176, 177, 183, 187, 195, 200, 207, 208]
+                    173, 176, 177, 183, 200, 207, 208]
 
-    newSubjects =  [#107AB, 
-                    109
+    testSubjects =  [#107AB, 
                     117, 
                     140,
                     147,
@@ -109,7 +120,7 @@ def main():
     taskType = ['colorwheel', 'samedifferent']
     num_runs = [1, 2, 3, 4]
     
-    for subjID in newSubjects:
+    for subjID in testSubjects:
         for task in taskType:
             for run in num_runs:
                 beta_weights = extract_beta_weights(run, subject_id=subjID, task_type=task)

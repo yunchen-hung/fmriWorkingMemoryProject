@@ -52,6 +52,9 @@ def extract_beta_weights(num_run, subject_id = None, task_type = 'colorwheel'):
         events = pd.read_csv(events_path, sep="\t", 
                             usecols=["onset", "duration"]).assign(
                             trial_type=task_type)
+        if events is None:
+            print(f"subject ID:{subject_id}, # run:{num_run}")
+            return
     
     except:
         #if there isn't a specific run, i.e. run 4
@@ -72,6 +75,7 @@ def extract_beta_weights(num_run, subject_id = None, task_type = 'colorwheel'):
 
     #design matrix = task (convolved with HRF) + confounds
     design_matrix = fmri_glm.design_matrices_[0]
+    print(design_matrix.columns)
     
     # map of parameter estimates / beta weights
     #this is the 'feature' map to use in classification
@@ -92,10 +96,20 @@ def main():
     top29Subjects = [103, 105, 106, 110, 112, 113, 115, 124, 127, 130, 
                     131, 133, 138, 142, 143, 145, 157, 159, 161, 165, 
                     173, 176, 177, 183, 187, 195, 200, 207, 208]
+
+    newSubjects =  [#107AB, 
+                    109
+                    117, 
+                    140,
+                    147,
+                    172, #173AB, 
+                    178, 180, 181, 182,
+                    188
+                    ]
     taskType = ['colorwheel', 'samedifferent']
     num_runs = [1, 2, 3, 4]
     
-    for subjID in top29Subjects:
+    for subjID in newSubjects:
         for task in taskType:
             for run in num_runs:
                 beta_weights = extract_beta_weights(run, subject_id=subjID, task_type=task)
