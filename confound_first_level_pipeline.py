@@ -104,12 +104,13 @@ def save_beta(img, subject_id = None, task_type = 'colorwheel', run_num=1):
     )
 
 def main():
-    top29Subjects = [103, 105, 106, 109, 110, 
+    top29Subjects = [103, 105, 106, 110, 
                     115, 124, 127, 130, 
                     131, 133, 138, 142, 143, 145, 157, 159, 161, 165, 
                     173, 176, 177, 183, 200, 207, 208]
 
     testSubjects =  [#107AB, 
+                    109,
                     117, 
                     140,
                     147,
