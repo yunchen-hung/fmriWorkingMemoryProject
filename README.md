@@ -6,7 +6,7 @@ Data is sourced from Kiyonaga, A.; Scimeca, J.; D’Esposito, M. (2018). Dissoci
 ](https://doi.org/10.6084/m9.figshare.7145873.v1)
 
 To reproduce our code, use the environment.yml to import a conda environment. This can be done with the following command: 
-conda env create -f environment.yml
+`conda env create -f environment.yml`
 
 The notable packages used are as follows:
 1. LIBSVM: Chih-Chung Chang and Chih-Jen Lin, LIBSVM : a library for support vector machines. ACM Transactions on Intelligent Systems and Technology, 2:27:1--27:27, 2011. Software available at [http://www.csie.ntu.edu.tw/~cjlin/libsvm](http://www.csie.ntu.edu.tw/~cjlin/libsvm)

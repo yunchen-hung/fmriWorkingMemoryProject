@@ -16,6 +16,9 @@ import nibabel as nib
 top29Subjects = [103, 105, 106, 110, 112, 113, 115, 124, 127, 130, 
                     131, 133, 138, 142, 143, 145, 157, 159, 161, 165, 
                     173, 176, 177, 183, 187, 195, 200, 207, 208]
+newSubjects =  [#107AB, 
+                109, 117, 140, 147, 172, #173AB, 
+                178, 180, 181, 182, 188]
 
 def load_beta_data(top29Subjects):
     taskType = ['colorwheel', 'samedifferent']
@@ -23,7 +26,7 @@ def load_beta_data(top29Subjects):
     
     X, y = [], []
 
-    for subjID in topSubjects:
+    for subjID in top29Subjects:
         for task in taskType:
             for run in num_runs:
                 try:
