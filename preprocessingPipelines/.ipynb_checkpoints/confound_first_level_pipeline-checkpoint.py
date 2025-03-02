@@ -104,24 +104,14 @@ def save_beta(img, subject_id = None, task_type = 'colorwheel', run_num=1):
     )
 
 def main():
-    top29Subjects = [103, 105, 106, 110, 
-                    115, 124, 127, 130, 
-                    131, 133, 138, 142, 143, 145, 157, 159, 161, 165, 
-                    173, 176, 177, 183, 200, 207, 208]
-
-    testSubjects =  [#107AB, 
-                    109,
-                    117, 
-                    140,
-                    147,
-                    172, #173AB, 
-                    178, 180, 181, 182,
-                    188
-                    ]
+    subjects = [103, 105, 106, 109, 110, 115, 117, 124, 
+           127, 130, 131, 133, 138, 140, 142, 143, 145,
+           147, 157, 159, 161, 165, 172, 176, 177, 178,
+           180, 181, 182, 183, 188, 200, 207, 208]
     taskType = ['colorwheel', 'samedifferent']
     num_runs = [1, 2, 3, 4]
     
-    for subjID in testSubjects:
+    for subjID in subjects:
         for task in taskType:
             for run in num_runs:
                 beta_weights = extract_beta_weights(run, subject_id=subjID, task_type=task)

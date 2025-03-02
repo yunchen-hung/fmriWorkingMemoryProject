@@ -45,14 +45,15 @@ def train_evaluate_model(X, y):
     return accuracy
 
 def main():
-    top29Subjects = [103, 105, 106, 110, 112, 113, 115, 124, 127, 130, 
-                    131, 133, 138, 142, 143, 145, 157, 159, 161, 165, 
-                    173, 176, 177, 183, 187, 195, 200, 207, 208]
+    subjects = [103, 105, 106, 109, 110, 115, 117, 124, 
+           127, 130, 131, 133, 138, 140, 142, 143, 145,
+           147, 157, 159, 161, 165, 172, 176, 177, 178,
+           180, 181, 182, 183, 188, 200, 207, 208]
     taskType = ['colorWheel', 'sameDifferent']
     all_subject_features = []
     all_subject_labels = []
     
-    for subjID in top29Subjects:
+    for subjID in subjects:
         for task in taskType:
             beta_weights = extract_beta_weights(subject_id=subjID, task_type=task)
             all_subject_features.append(beta_weights)
