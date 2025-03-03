@@ -16,52 +16,110 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import accuracy_score, confusion_matrix, ConfusionMatrixDisplay
 
-from first_level_pipeline import extract_beta_weights
-
-def train_evaluate_model(X, y):
+def load_beta_data_nonconfound():
     
+    X, y = [], []
+    
+    directories = [Path("~/teams/a05/group_1_data/nonConfoundBeta/").expanduser(), 
+    Path("~/teams/a05/group_1_data/nonConfoundBeta/betas/").expanduser()]
+
+    for directory in directories:
+        
+        beta_files = list(directory.glob("beta_*.nii.gz"))
+
+        for file_path in beta_files:
+            
+            file_name = file_path.stem
+            subjID = file_name.split("_")[1]
+            task = file_name.split("_")[2]
+
+            beta_img = nib.load(str(file_path))
+            beta_data = beta_img.get_fdata().flatten()
+            
+            X.append(beta_data)
+            y.append(task)
+
+    return np.array(X), np.array(y)
+
+def load_beta_data_confound():
+    
+    X, y = [], []
+    
+    directories = [Path("~/teams/a05/group_1_data/confoundBeta/").expanduser(), 
+    Path("~/teams/a05/group_1_data/confoundBeta/betas/").expanduser()]
+
+    for directory in directories:
+        
+        beta_files = list(directory.glob("beta_*.nii.gz"))
+
+        for file_path in beta_files:
+            
+            file_name = file_path.stem
+            subjID = file_name.split("_")[1]
+            task = file_name.split("_")[2]
+
+            beta_img = nib.load(str(file_path))
+            beta_data = beta_img.get_fdata().flatten()
+            
+            X.append(beta_data)
+            y.append(task)
+
+    return np.array(X), np.array(y)
+
+def split_train_test_valid(X, y): #split data into 20% test 20% validation 60% training
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.25, random_state=42) #0.25 * 0.8 = 0.2
+    return X_train, X_val, X_test, y_train, y_val, y_test
 
-    # Feature Scaling for KNN
-    scaler = StandardScaler()
-    X_train = scaler.fit_transform(X_train)
-    X_test = scaler.transform(X_test)
+def KNN_nonconfound(X_train, y_train, X_test, y_test):
+    
+    model = KNeighborsClassifier(n_neighbors=12)
+    model.fit(X_train, y_train)
+    y_pred = model.predict(X_test)
 
-    # KNN classifier
-    knn_model = KNeighborsClassifier(n_neighbors=5)
-    knn_model.fit(X_train, y_train)
-    y_pred = knn_model.predict(X_test)
-
-    # Evaluate performance
     accuracy = accuracy_score(y_test, y_pred)
-    print("Model Accuracy: " + str(accuracy))
+    print(f"Model Accuracy: {accuracy:.4f}")
 
-    # Confusion matrix
     cm = confusion_matrix(y_test, y_pred)
     disp = ConfusionMatrixDisplay(confusion_matrix=cm)
     disp.plot()
-    show()
+    plt.show()
 
-    return accuracy
+    return model
+
+def KNN_confound(X_train, y_train, X_test, y_test):
+    
+    model = KNeighborsClassifier(n_neighbors=19)
+    model.fit(X_train, y_train)
+    y_pred = model.predict(X_test)
+
+    accuracy = accuracy_score(y_test, y_pred)
+    print(f"Model Accuracy: {accuracy:.4f}")
+
+    cm = confusion_matrix(y_test, y_pred)
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm)
+    disp.plot()
+    plt.show()
+
+    return model
+
 
 def main():
-    subjects = [103, 105, 106, 109, 110, 115, 117, 124, 
-           127, 130, 131, 133, 138, 140, 142, 143, 145,
-           147, 157, 159, 161, 165, 172, 176, 177, 178,
-           180, 181, 182, 183, 188, 200, 207, 208]
-    taskType = ['colorWheel', 'sameDifferent']
-    all_subject_features = []
-    all_subject_labels = []
+    # Load non-confound data
+    X_nonconfound, y_nonconfound = load_beta_data_nonconfound()
+    X_train_nonconfound, X_val_nonconfound, X_test_nonconfound, y_train_nonconfound, y_val_nonconfound, y_test_nonconfound = split_train_test_valid(X_nonconfound, y_nonconfound)
     
-    for subjID in subjects:
-        for task in taskType:
-            beta_weights = extract_beta_weights(subject_id=subjID, task_type=task)
-            all_subject_features.append(beta_weights)
-            all_subject_labels.append(0 if task == 'colorWheel' else 1)  # Convert task labels to binary
+    # Load confound data
+    X_confound, y_confound = load_beta_data_confound()
+    X_train_confound, X_val_confound, X_test_confound, y_train_confound, y_val_confound, y_test_confound = split_train_test_valid(X_confound, y_confound)
 
-    X = np.array(all_subject_features)
-    y = np.array(all_subject_labels)
+    # Train and display results for non-confound data
+    print("Results for Non-Confound Data:")
+    model_nonconfound = KNN_nonconfound(X_train_nonconfound, y_train_nonconfound, X_test_nonconfound, y_test_nonconfound)
 
-    # Train and evaluate the model
-    accuracy_score = train_evaluate_model(X, y)
-    print(accuracy_score)
+    # Train and display results for confound data
+    print("Results for Confound Data:")
+    model_confound = KNN_confound(X_train_confound, y_train_confound, X_test_confound, y_test_confound)
+
+if __name__ == "__main__":
+    main()
