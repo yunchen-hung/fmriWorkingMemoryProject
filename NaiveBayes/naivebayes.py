@@ -1,5 +1,13 @@
 import pandas as pd
 import numpy as np
+import glob
+import sys
+import os
+sys.path.append(os.path.abspath("../preprocessingPipelines")) 
+
+from dataExtraction import *
+from confound_first_level_pipeline import main
+from noConfound_first_level_pipeline import main
 
 #nilearn imports
 from nilearn import plotting, image, interfaces

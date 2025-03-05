@@ -1,10 +1,13 @@
 import pandas as pd
 import numpy as np
 import glob
+import sys
+import os
+sys.path.append(os.path.abspath("../preprocessingPipelines")) 
 
-#data import
-from dataExtraction import load_beta_data
-
+from dataExtraction import *
+from confound_first_level_pipeline import main
+from noConfound_first_level_pipeline import main
 #LIBSVM
 from libsvm.svmutil import *
 
@@ -68,9 +71,16 @@ def train_svmLight(X, y):
     return svm_model
 
 def main():
-    top29Subjects = [103, 105, 106, 110, 112, 113, 115, 124, 127, 130, 
-                    131, 133, 138, 142, 143, 145, 157, 159, 161, 165, 
-                    173, 176, 177, 183, 187, 195, 200, 207, 208]
-    X, y = load_beta_data(subjects, 'nonConfound')
-    y = [1 if task == 'colorwheel' else 0 for task in y]
-    train_model(X, y)
+    subjects = [103, 105, 106, 109, 110, 115, 117, 124, 
+           127, 130, 131, 133, 138, 140, 142, 143, 145,
+           147, 157, 159, 161, 165, 172, 176, 177, 178,
+           180, 181, 182, 183, 188, 200, 207, 208]
+
+    X_nonConfound, y_nonConfound = load_beta_data(subjects, 'nonConfound')
+    y_nonConfound = [1 if task == 'colorwheel' else 0 for task in y]
+    train_svmLight(X_nonConfound, y_nonConfound)
+
+    X_confound, y_confound = load_beta_data(subjects, 'confound')
+    y_confound = [1 if task == 'colorwheel' else 0 for task in y]
+    train_svmLight(X_confound, y_confound)
+
