@@ -12,7 +12,7 @@ In our project, we looked into the performance of popular Multivoxel Pattern Ana
 
 The dataset in our project was sourced from the paper by [Scimeca et al. (2018)](https://osf.io/58pyw). Subjects were asked to perform two different visual working memory tasks, and they would alternate between each task for 4 runs each for a total of one hour in a functional magnetic resonance imaging (fMRI) machine. The two tasks were fairly similar but for the memory recall part. Subjects were asked to memorize three differently colored patches, then after a delay they were cued to recall the color of one of the squares by using a color wheel (task ‘color wheel’) or performing a binary response (task ‘same different’).
 
-![Dataset Memory Tasks](./results/task.png "Dataset Memory Tasks")
+<img src="./results/task.png" alt="Dataset Memory Tasks" width="200"/>
 
 We selected 34 subjects from the original pool of subjects, and each subject had performed 4 runs of both tasks. The brain imaging data is a 4-dimensional image containing brains as voxels and the time series data.
 
@@ -25,7 +25,9 @@ To achieve this, we performed a first-level analysis on individual participants 
 Notably, we created two versions of the fMRI brain imaging dataset:
 
 - A denoised, cleaned brain image
+  <img src="./results/nonconfound_beta_colorwheel.png" alt="nonconfound_beta_colorwheel" width="200"/> <img src="./results/nonconfound_beta_samedifferent.png" alt="nonconfound_beta_samedifferent" width="200"/>
 - A confounded brain imaging (including the extra white matter, cerebral spinal fluid, brain rotation and translation noise for each individual)
+  <img src="./results/confound_beta_colorwheel.png" alt="confound_beta_colorwheel" width="200"/> <img src="./results/confound_beta_samedifferent.png" alt="confound_beta_samedifferent" width="200"/>
 
 ### Model building
 
@@ -44,11 +46,11 @@ Our accuracies for each model for each dataset are as follows:
 
 To understand which brain regions were correlated with each task, we chose to plot the model coefficients back as a 3D brain. As the model coefficients for Logistic Regression are the most interpretable, we transformed the 1-dimensional array of coefficients into a 3-dimensional brain map.
 
-![NonConfound Coefficient Map](./results/logistic_nonConfounds_coeff.png "NonConfound Logistic Regression Coefficient Map") ![Confound Coefficient Map](./results/logistic_confounds_coeff.png "Confound Logistic Regression Coefficient Map")
+<img src="./results/logistic_nonConfounds_coeff.png" alt="NonConfound Coefficient Map" width="200"/> <img src="./results/logistic_confounds_coeff.png" alt="Confound Coefficient Map" width="200"/>
 
 From our model coefficients, we can interpret that predicting the ‘same different’ task is highly correlated with the beta weights from the prefrontal cortex (red region), while the ‘color wheel’ task is associated with the intraparietal sulcus (blue region).
 
-![Expected Brain Regions](./results/expected_brain.png "Expected Brain Regions")
+<img src="./results/expected_brain.png" alt="Expected Brain Regions" width="200"/>
 
 ## Conclusion
 
