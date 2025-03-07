@@ -7,10 +7,12 @@ To reproduce our code, use the environment.yml to import a conda environment. Th
 2. Move the saved betas into folders called `confoundBeta` or `nonConfoundBeta`
 3. To retrieve the saved beta weights only within the brain itself and the task labels, `preprocessingPipelines/dataExtraction.py`.
 4. Given our dataset, we can now run the model training and testing code!
-   1. For SVM, run `SVM/svm.py` to see the confusion matrix and coefficient brain map
-   2. For Logistic Regression, run `LogisticRegression/logreg.py` to see the confusion matrix and coefficient brain map
-   3. For Naive Bayes, run `NaiveBayes/naivebayes.py` to see the confusion matrix
-   4. For kNN, run `kNN/knn.py` to see the confusion matrix 
+   1. For SVM, run `SVM/svm.ipynb` to see the confusion matrix and coefficient brain map
+   2. For Logistic Regression, run `LogisticRegression/logistic_confounds.ipynb` for the confounded betas and `LogisticRegression/logistic_nonConfounds.ipynb` for the non confounded betas, and to see the confusion matrix and coefficient brain map
+   3. For Naive Bayes, run `NaiveBayes/naivebayes_confounds.ipynb` for the confounded betas and `NaiveBayes/naivebayes_nonconfounds.ipynb` for the non confounded betas
+   4. For kNN, run `kNN/knn_confounds.ipynb` for the confounded betas and `kNN/knn_nonconfounds.ipynb` for the non confounded betas
+
+Additional: To plot single subject, single run beta weights for both tasks AND the Nilearn MNI 152 brain mask we used for the mode training, run `imageResults/plotting_maps.ipynb`
 
 
 
