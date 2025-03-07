@@ -10,7 +10,7 @@ In our project, we looked into the performance of popular Multivoxel Pattern Ana
 
 ### Data Collection
 
-The dataset in our project was sourced from the paper by (Scimeca et al. (2018))[https://osf.io/58pyw]. Subjects were asked to perform two different visual working memory tasks, and they would alternate between each task for 4 runs each for a total of one hour in a functional magnetic resonance imaging (fMRI) machine. The two tasks were fairly similar but for the memory recall part. Subjects were asked to memorize three differently colored patches, then after a delay they were cued to recall the color of one of the squares by using a color wheel (task ‘color wheel’) or performing a binary response (task ‘same different’).
+The dataset in our project was sourced from the paper by [Scimeca et al. (2018)](https://osf.io/58pyw). Subjects were asked to perform two different visual working memory tasks, and they would alternate between each task for 4 runs each for a total of one hour in a functional magnetic resonance imaging (fMRI) machine. The two tasks were fairly similar but for the memory recall part. Subjects were asked to memorize three differently colored patches, then after a delay they were cued to recall the color of one of the squares by using a color wheel (task ‘color wheel’) or performing a binary response (task ‘same different’).
 
 ![Dataset Memory Tasks](/results/task.png "Dataset Memory Tasks")
 
@@ -56,4 +56,4 @@ From our model coefficients, we can interpret that predicting the ‘same differ
 
 ## Special Thanks!
 
-We want to thank (Dr. Armin Schwartzman)[https://schwartzman.scholar.st] and (Gabriel Riegner)[https://griegner.github.io] for their advice and support throughout this project, (Dr. Anastasia Kiyonaga)[https://www.kiyonagalab.org/pi-anastasia-kiyonaga] and Sihan Yang for lending and explaining the dataset, and HDSI for printing this poster. We could not have done this without you!
+We want to thank [Dr. Armin Schwartzman](https://schwartzman.scholar.st) and [Gabriel Riegner](https://griegner.github.io) for their advice and support throughout this project, [Dr. Anastasia Kiyonaga](https://www.kiyonagalab.org/pi-anastasia-kiyonaga) and Sihan Yang for lending and explaining the dataset, and HDSI for printing this poster. We could not have done this without you!
