@@ -1,4 +1,3 @@
-By Jennifer Hung, Judel Ancayan, Sahana Narayanan
 
 # About
 
