@@ -40,7 +40,7 @@ Notably, we created two versions of the fMRI brain imaging dataset:
 
 ## Model building
 
-For each individual run in our dataset, we flattened the 3-dimensional beta weights into a 2-dimensional array as a data point with 235, 375 features. We then trained our dataset on [SVM] (https://www.geeksforgeeks.org/support-vector-machine-algorithm/), [Naive Bayes](https://www.geeksforgeeks.org/naive-bayes-classifiers/), [Logistic Regression](https://www.geeksforgeeks.org/understanding-logistic-regression/), and [k-Nearest Neighbors](https://www.geeksforgeeks.org/k-nearest-neighbours/). Our evaluation metric included accuracy.
+For each individual run in our dataset, we flattened the 3-dimensional beta weights into a 2-dimensional array as a data point with 235, 375 features. We then trained our dataset on [SVM](https://www.geeksforgeeks.org/support-vector-machine-algorithm/), [Naive Bayes](https://www.geeksforgeeks.org/naive-bayes-classifiers/), [Logistic Regression](https://www.geeksforgeeks.org/understanding-logistic-regression/), and [k-Nearest Neighbors](https://www.geeksforgeeks.org/k-nearest-neighbours/). Our evaluation metric included accuracy.
 
 # Results
 
